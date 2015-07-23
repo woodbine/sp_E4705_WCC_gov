@@ -66,6 +66,8 @@ for link in links:
     linkfile = 'http://www.wakefield.gov.uk' + link['href']
     if not '.pdf' in linkfile:
         csv_year = csvfile.split('-')[-1].strip().split(' ')[0]
+        if '16 Quarter 1' in csvfile.split('-')[-1]:
+            csv_year = '15'
         if 'Quarter 4' in csvfile:
             csvMth = 'Dec'
         if 'Quarter 3' in csvfile:
