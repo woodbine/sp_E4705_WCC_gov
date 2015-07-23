@@ -68,7 +68,7 @@ for link in links:
        # csv_year = csvfile.split('-')[-1].strip().split(' ')[0]
         csv_year = csvfile.split('-')[-2].strip()
         if '16 Quarter 1' in csvfile.split('-')[-1]:
-            csv_year = '15'
+            csv_year = '2015'
         if 'Quarter 4' in csvfile:
             csvMth = 'Dec'
         if 'Quarter 3' in csvfile:
