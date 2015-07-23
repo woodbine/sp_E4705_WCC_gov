@@ -77,7 +77,7 @@ for link in links:
             csvMth = 'Jun'
         if 'Quarter 1' in csvfile:
             csvMth = 'Mar'
-        csvYr = '20' + csv_year
+        csvYr = csv_year
         csvMth = convert_mth_strings(csvMth.upper())
         filename = entity_id + "_" + csvYr + "_" + csvMth
         todays_date = str(datetime.now())
