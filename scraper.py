@@ -29,12 +29,12 @@ def validateFilename(filename):
         return True
 def validateURL(url):
     try:
-        r = requests.get(url, allow_redirects=True, timeout=90)
+        r = requests.get(url, allow_redirects=True, timeout=20)
         count = 1
         while r.status_code == 500 and count < 4:
             print ("Attempt {0} - Status code: {1}. Retrying.".format(count, r.status_code))
             count += 1
-            r = requests.get(url, allow_redirects=True, timeout=90)
+            r = requests.get(url, allow_redirects=True, timeout=20)
         sourceFilename = r.headers.get('Content-Disposition')
 
         if sourceFilename:
@@ -67,8 +67,8 @@ for link in links:
     if not '.pdf' in linkfile:
        # csv_year = csvfile.split('-')[-1].strip().split(' ')[0]
         csv_year = csvfile.split('-')[-2].strip()
-        if '16 Quarter 1' in csvfile.split('-')[-1]:
-            csv_year = '2015'
+        # if '16 Quarter 1' in csvfile.split('-')[-1]:
+        #     csv_year = '15'
         if 'Quarter 4' in csvfile:
             csvMth = 'Dec'
         if 'Quarter 3' in csvfile:
@@ -79,7 +79,8 @@ for link in links:
             csvMth = 'Mar'
         csvYr = csv_year
         csvMth = convert_mth_strings(csvMth.upper())
-        filename = entity_id + "_" + csvYr + "_" + csvMth
+        if 'Quarter' in link.text:
+            filename = 'Q'+entity_id + "_" + csvYr + "_" + csvMth
         todays_date = str(datetime.now())
         file_url = linkfile.strip()
         validFilename = validateFilename(filename)
