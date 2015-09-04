@@ -7,6 +7,7 @@ import urllib2
 from datetime import datetime
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
+import urllib
 
 # Set up variables
 entity_id = "E4705_WCC_gov"
