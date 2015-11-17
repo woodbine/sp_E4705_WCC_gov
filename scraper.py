@@ -8,10 +8,11 @@ import scraperwiki
 import urllib2
 from datetime import datetime
 from bs4 import BeautifulSoup
-import requests
-import urllib
 
-#### FUNCTIONS 1.0
+
+#### FUNCTIONS 1.2
+
+import requests       # import requests to validate URL
 
 def validateFilename(filename):
     filenameregex = '^[a-zA-Z0-9]+_[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9][0-9][0-9][0-9]_[0-9QY][0-9]$'
@@ -39,20 +40,21 @@ def validateFilename(filename):
 
 def validateURL(url):
     try:
-        r = urllib.urlopen(url)
+        r = requests.get(url, allow_redirects=True, timeout=20)
         count = 1
-        while r.getcode() == 500 and count < 4:
+        while r.status_code == 500 and count < 4:
             print ("Attempt {0} - Status code: {1}. Retrying.".format(count, r.status_code))
             count += 1
-            r = urllib.urlopen(url)
+            r = requests.get(url, allow_redirects=True, timeout=20)
         sourceFilename = r.headers.get('Content-Disposition')
-
         if sourceFilename:
             ext = os.path.splitext(sourceFilename)[1].replace('"', '').replace(';', '').replace(' ', '')
+        elif r.headers['Content-Type'] == 'text/csv':
+            ext = '.csv'
         else:
             ext = os.path.splitext(url)[1]
-        validURL = r.getcode() == 200
-        validFiletype = ext in ['.csv', '.xls', '.xlsx']
+        validURL = r.status_code == 200
+        validFiletype = ext.lower() in ['.csv', '.xls', '.xlsx']
         return validURL, validFiletype
     except:
         print ("Error validating URL.")
@@ -91,7 +93,7 @@ url = "http://www.wakefield.gov.uk/about-the-council/budget-and-spending/payment
 errors = 0
 data = []
 
-#### READ HTML 1.1 - no "lxml"
+#### READ HTML 1.0
 
 html = urllib2.urlopen(url)
 soup = BeautifulSoup(html, "lxml")
@@ -104,10 +106,7 @@ for link in links:
     csvfile = link.text.strip()
     url = 'http://www.wakefield.gov.uk' + link['href']
     if not '.pdf' in url:
-       # csv_year = csvfile.split('-')[-1].strip().split(' ')[0]
         csv_year = csvfile.split('-')[-2].strip()
-        # if '16 Quarter 1' in csvfile.split('-')[-1]:
-        #     csv_year = '15'
         if 'Quarter 4' in csvfile:
             csvMth = 'Q4'
         if 'Quarter 3' in csvfile:
@@ -116,6 +115,8 @@ for link in links:
             csvMth = 'Q2'
         if 'Quarter 1' in csvfile:
             csvMth = 'Q1'
+        if '15' in csv_year:
+            csv_year = '2015'
         csvYr = csv_year
         csvMth = convert_mth_strings(csvMth.upper())
         todays_date = str(datetime.now())
